@@ -10,7 +10,7 @@ function App() {
   const [completedTodos, setCompletedTodos] = useState([]);
   const [isCompletedScreen, setIsCompletedScreen] = useState(false);
 
-  const handleAddNewToDo = () => {
+  const handleAddNewToDo = () => {  
     if (newTodoTitle || newDescription) {
        let newToDoObj = {
          title: newTodoTitle,
@@ -102,7 +102,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>My Todos</h1>
+      <h1 className='mt-16 text-3xl'>Task Tracker</h1>
 
       <div className="todo-wrapper">
 
