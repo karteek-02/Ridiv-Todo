@@ -10,23 +10,38 @@ function App() {
   const [completedTodos, setCompletedTodos] = useState([]);
   const [isCompletedScreen, setIsCompletedScreen] = useState(false);
 
-  const handleAddNewToDo = () => {  
+  function handleOnDragEnd(result) {
+    if (!result.destination) return;
+
+    const items = Array.from(allTodos);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setAllTodos(items);
+    localStorage.setItem('todolist', JSON.stringify(items));
+  }
+
+  function convertToDate(dateString) {
+    const [day, month, year, time] = dateString.split(/[- at:]/);
+    return new Date(`${month}/${day}/${year} ${time}`);
+  }
+
+  const handleAddNewToDo = () => {
     if (newTodoTitle || newDescription) {
-       let newToDoObj = {
-         title: newTodoTitle,
-         description: newDescription,
-       };
-       let updatedTodoArr = [...allTodos];
-       updatedTodoArr.push(newToDoObj);
-       setAllTodos(updatedTodoArr);
-       localStorage.setItem('todolist', JSON.stringify(updatedTodoArr));
-       setNewDescription('');
-       setNewTodoTitle('');
+      let newToDoObj = {
+        title: newTodoTitle,
+        description: newDescription,
+      };
+      let updatedTodoArr = [...allTodos];
+      updatedTodoArr.push(newToDoObj);
+      setAllTodos(updatedTodoArr);
+      localStorage.setItem('todolist', JSON.stringify(updatedTodoArr));
+      setNewDescription('');
+      setNewTodoTitle('');
     } else {
-       alert("Please enter a title or description.");
+      alert("Please enter a title or description.");
     }
-   };
-   
+  };
 
   useEffect(() => {
     let savedTodos = JSON.parse(localStorage.getItem('todolist'));
@@ -58,17 +73,6 @@ function App() {
     localStorage.setItem('completedTodos', JSON.stringify(reducedCompletedTodos));
     setCompletedTodos(reducedCompletedTodos);
   };
-
-  function handleOnDragEnd(result) {
-    if (!result.destination) return;
-   
-    const items = Array.from(allTodos);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-   
-    setAllTodos(items);
-   }
-   
 
   const handleComplete = index => {
     const date = new Date();
@@ -112,7 +116,7 @@ function App() {
             <input
               type="text"
               value={newTodoTitle}
-              style={{ color: 'black'}}
+              style={{ color: 'black' }}
               onChange={e => setNewTodoTitle(e.target.value)}
               placeholder="What's the title of your To Do?"
             />
@@ -130,7 +134,7 @@ function App() {
           <div className="todo-input-item">
             <button
               className="primary-btn "
-              style={{marginTop: '35px' , borderRadius: '10%'}}
+              style={{ marginTop: '35px', borderRadius: '10%' }}
               type="button"
               onClick={handleAddNewToDo}
             >
@@ -142,22 +146,21 @@ function App() {
           <button
             className={`secondaryBtn ${isCompletedScreen === false && 'active'}`}
             onClick={() => setIsCompletedScreen(false)}
-            style={{borderRadius: '10%'}}
+            style={{ borderRadius: '10%' }}
           >
             To Do
           </button>
           <button
-            className={`secondaryBtn ml-1 ${isCompletedScreen === true && 'active'}` }
+            className={`secondaryBtn ml-1 ${isCompletedScreen === true && 'active'}`}
             onClick={() => setIsCompletedScreen(true)}
-            style={{borderRadius: '10%'}}
+            style={{ borderRadius: '10%' }}
           >
             Completed
           </button>
         </div>
 
-
         <div className="todo-list">
-        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <DragDropContext onDragEnd={handleOnDragEnd}>
             <Droppable droppableId="todos">
               {(provided) => (
                 <div className="todo-list" {...provided.droppableProps} ref={provided.innerRef}>
@@ -189,32 +192,32 @@ function App() {
                       </Draggable>
                     ))}
                   {isCompletedScreen === true && completedTodos.length > 0 &&
-                    completedTodos.filter(item => item !== null).map((item, index) => (
-                      <Draggable key={index} draggableId={index.toString()} index={index}>
-                        {(provided) => (
-                          <div className="todo-list-item" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                            <div>
-                              <h3>{item.title}</h3>
-                              <p>{item.description}</p>
-                              <p> <i>Completed at: {item.completedOn}</i></p>
-                            </div>
-                            <div>
-                              <AiOutlineDelete
-                                className="icon"
-                                onClick={() => handleCompletedTodoDelete(index)}
-                              />
-                            </div>
+                    completedTodos
+                      .sort((a, b) => convertToDate(b.completedOn) - convertToDate(a.completedOn))
+                      .filter(item => item !== null)
+                      .map((item, index) => (
+                        <div className="todo-list-item">
+                          <div>
+                            <h3>{item.title}</h3>
+                            <p>{item.description}</p>
+                            <p> <i>Completed at: {item.completedOn}</i></p>
                           </div>
-                        )}
-                      </Draggable>
-                    ))}
+                          <div>
+                            <AiOutlineDelete
+                              className="icon"
+                              onClick={() => handleCompletedTodoDelete(index)}
+                            />
+                          </div>
+                        </div>
+                      ))}
+
+
                   {provided.placeholder}
                 </div>
               )}
             </Droppable>
           </DragDropContext>
         </div>
-
       </div>
     </div>
   );
