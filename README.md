@@ -1,4 +1,4 @@
-# Ridiv-Todo
+# Task-Tracker
 
 This is a simple Todo list application built using React. It allows users to add tasks, mark them as completed, and delete them. The tasks are stored locally in the browser's local storage.
 
@@ -16,7 +16,7 @@ To install and run this application, follow these steps:
 
 1. Clone the repository:
 
-- ` git clone  https://github.com/karteek-02/Ridiv-Todo.git`
+- ` git clone  https://github.com/karteek-02/Task-Tracker`
 
 2. Navigate into the cloned directory:
 
